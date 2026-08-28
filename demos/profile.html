@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Профіль</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="card">
+    <h1 id="title">Завантаження...</h1>
+    <p class="muted" id="role"></p>
+    <div id="story"></div>
+  </div>
+
+<script>
+fetch('../data/profile.json')
+  .then((response) => response.text())
+  .then((raw) => {
+    const person = JSON.parse(raw);
+    document.getElementById('title').textContent = person.fullName;
+    document.getElementById('role').textContent = person.role;
+    const story = document.getElementById('story');
+    person.story.forEach((paragraph) => {
+      const p = document.createElement('p');
+      p.textContent = paragraph;
+      story.appendChild(p);
+    });
+  });
+</script>
+</body>
+</html>

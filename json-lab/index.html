@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>JSON-лабораторія</title>
+<style>
+  body { font-family: -apple-system, "Segoe UI", Arial, sans-serif; background:#f4f6f8; max-width:640px; margin:40px auto; padding:0 20px; }
+  textarea { width:100%; height:140px; font-family: "SF Mono", Menlo, monospace; font-size:13px; padding:10px; box-sizing:border-box; border-radius:8px; border:1px solid #ccc; }
+  button { background:#2f6fed; color:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; margin-right:8px; margin-top:10px; }
+  #status { margin-top:10px; font-weight:bold; }
+  .ok { color: #1c8a3e; }
+  .err { color: #c0392b; }
+  pre { background:#1e1e1e; color:#e8e8e8; padding:14px; border-radius:8px; overflow:auto; }
+</style>
+</head>
+<body>
+  <h1>JSON-лабораторія</h1>
+  <textarea id="input">{"name": "Михайло", "skills": ["Python", "JS"]}</textarea>
+  <div>
+    <button id="check">Перевірити</button>
+    <button id="format">Форматувати</button>
+    <button id="loadExample">Завантажити приклад</button>
+  </div>
+  <div id="status"></div>
+  <pre id="output"></pre>
+
+<script>
+const input = document.getElementById('input');
+const status = document.getElementById('status');
+const output = document.getElementById('output');
+
+function tryParse() {
+  try {
+    const value = JSON.parse(input.value);
+    status.textContent = 'дійсний JSON';
+    status.className = 'ok';
+    return value;
+  } catch (error) {
+    status.textContent = 'недійсний JSON: ' + error.message;
+    status.className = 'err';
+    return null;
+  }
+}
+
+document.getElementById('check').addEventListener('click', () => {
+  tryParse();
+  output.textContent = '';
+});
+
+document.getElementById('format').addEventListener('click', () => {
+  const value = tryParse();
+  if (value !== null) {
+    output.textContent = JSON.stringify(value, null, 2);
+  }
+});
+
+document.getElementById('loadExample').addEventListener('click', () => {
+  fetch('../data/shopping.json')
+    .then((r) => r.text())
+    .then((raw) => {
+      input.value = raw;
+      tryParse();
+    });
+});
+
+if (location.search.includes('demo')) {
+  const value = tryParse();
+  if (value !== null) {
+    output.textContent = JSON.stringify(value, null, 2);
+  }
+}
+</script>
+</body>
+</html>

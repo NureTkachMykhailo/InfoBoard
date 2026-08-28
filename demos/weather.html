@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Погода</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="card">
+    <h1>Погода в Харкові</h1>
+    <p id="result">Завантаження...</p>
+  </div>
+
+<script>
+const url = 'https://api.open-meteo.com/v1/forecast?latitude=49.9935&longitude=36.2304&current=temperature_2m,weather_code';
+
+fetch(url)
+  .then((response) => response.text())
+  .then((raw) => {
+    const data = JSON.parse(raw);
+    const temp = data.current.temperature_2m;
+    const code = data.current.weather_code;
+    document.getElementById('result').textContent =
+      'Поточна температура: ' + temp + '°C (код погодних умов WMO: ' + code + ')';
+  })
+  .catch((err) => {
+    document.getElementById('result').textContent = 'Помилка запиту: ' + err.message;
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Цитата дня</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="card">
+    <h1>Випадкова цитата</h1>
+    <p id="quote" style="font-size:18px;"></p>
+    <button id="next">ще одну</button>
+  </div>
+
+<script>
+let quotes = [];
+
+fetch('../data/quotes.json')
+  .then((response) => response.text())
+  .then((raw) => {
+    quotes = JSON.parse(raw).quotes;
+    showRandom();
+  });
+
+function showRandom() {
+  const pick = quotes[Math.floor(Math.random() * quotes.length)];
+  document.getElementById('quote').textContent = '«' + pick + '»';
+}
+
+document.getElementById('next').addEventListener('click', showRandom);
+</script>
+</body>
+</html>

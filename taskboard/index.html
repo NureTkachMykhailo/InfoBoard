@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Taskboard</title>
+<style>
+  body { font-family: -apple-system, "Segoe UI", Arial, sans-serif; background:#f4f6f8; max-width:700px; margin:40px auto; padding:0 20px; }
+  .controls { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+  select, input { padding:6px 10px; border-radius:6px; border:1px solid #ccc; }
+  .task { background:#fff; border-radius:8px; padding:12px 16px; margin-bottom:8px; display:flex; align-items:center; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+  .task.done { opacity:0.55; text-decoration: line-through; }
+  .check { width:20px; height:20px; margin-right:12px; cursor:pointer; }
+  .title { flex:1; }
+  .weight { font-size:12px; color:#888; margin-left:8px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="vendor/react.production.min.js"></script>
+<script src="vendor/react-dom.production.min.js"></script>
+
+<script>
+const { useState, useMemo, createElement: h } = React;
+
+const initialTasks = [
+  { id: 1, title: "Налаштувати проєкт", status: "done", weight: 3, when: "2026-08-10" },
+  { id: 2, title: "Скласти список JSON-джерел", status: "done", weight: 2, when: "2026-08-12" },
+  { id: 3, title: "Реалізувати HTML-демо рівня 1", status: "done", weight: 5, when: "2026-08-14" },
+  { id: 4, title: "Написати JSON-лабораторію", status: "open", weight: 4, when: "2026-08-16" },
+  { id: 5, title: "Зверстати Taskboard на React", status: "open", weight: 5, when: "2026-08-18" },
+  { id: 6, title: "Додати пошук і сортування", status: "open", weight: 3, when: "2026-08-19" },
+  { id: 7, title: "Оформити звіт", status: "open", weight: 1, when: "2026-08-20" },
+];
+
+function App() {
+  const [tasks, setTasks] = useState(initialTasks);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("weight");
+
+  function toggle(id) {
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === id ? { ...t, status: t.status === "done" ? "open" : "done" } : t
+      )
+    );
+  }
+
+  const visible = useMemo(() => {
+    const bySearch = search.trim().toLowerCase();
+    const filtered = tasks
+      .filter((t) => statusFilter === "all" || t.status === statusFilter)
+      .filter((t) => !bySearch || t.title.toLowerCase().includes(bySearch));
+
+    return [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case "title": return a.title.localeCompare(b.title, "uk");
+        case "when": return a.when.localeCompare(b.when, "uk");
+        default: return b.weight - a.weight;
+      }
+    });
+  }, [tasks, statusFilter, search, sortBy]);
+
+  return h("div", null,
+    h("h1", null, "Taskboard"),
+    h("div", { className: "controls" },
+      h("select", { value: statusFilter, onChange: (e) => setStatusFilter(e.target.value) },
+        h("option", { value: "all" }, "всі"),
+        h("option", { value: "open" }, "ще треба"),
+        h("option", { value: "done" }, "закрито")
+      ),
+      h("input", {
+        placeholder: "пошук за назвою...",
+        value: search,
+        onChange: (e) => setSearch(e.target.value),
+      }),
+      h("select", { value: sortBy, onChange: (e) => setSortBy(e.target.value) },
+        h("option", { value: "weight" }, "за важливістю"),
+        h("option", { value: "when" }, "за датою"),
+        h("option", { value: "title" }, "за алфавітом")
+      )
+    ),
+    visible.map((t) =>
+      h("div", { key: t.id, className: "task" + (t.status === "done" ? " done" : "") },
+        h("input", {
+          type: "checkbox",
+          className: "check",
+          checked: t.status === "done",
+          onChange: () => toggle(t.id),
+        }),
+        h("span", { className: "title" }, t.title),
+        h("span", { className: "weight" }, "вага: " + t.weight)
+      )
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(h(App));
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>Список покупок</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="card">
+    <h1 id="title">Завантаження...</h1>
+    <p class="muted" id="note"></p>
+    <ul id="list"></ul>
+  </div>
+
+<script>
+fetch('../data/shopping.json')
+  .then((response) => response.text())
+  .then((raw) => {
+    const data = JSON.parse(raw);
+    document.getElementById('title').textContent = data.title;
+    document.getElementById('note').textContent = data.note;
+    const list = document.getElementById('list');
+    data.items.forEach((item) => {
+      const li = document.createElement('li');
+      li.textContent = item.name + ' — ' + item.note;
+      list.appendChild(li);
+    });
+  });
+</script>
+</body>
+</html>
